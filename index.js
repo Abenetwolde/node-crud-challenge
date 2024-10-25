@@ -1,17 +1,27 @@
-const express = require('express')
-const app = express()
+const express = require('express');
+const bodyParser = require('body-parser');
+const personRoutes = require('./routes/personRoutes'); // Assuming you have this file set up
+const personController = require('./controllers/personController'); // Import the controller
+const { errorMiddleware } = require('./utils/errorHandler');
+const app = express();
 
-let persons = [{
+const db = [{
     id: '1',
     name: 'Sam',
-    age: '26',
-    hobbies: []    
-}] //This is your in memory database
+    age: 26,
+    hobbies: []
+}];
 
-app.set('db', persons)
-//TODO: Implement crud of person
+app.set('db', db);
 
-if (require.main === module) {
-    app.listen(3000)
-}
+
+app.use(bodyParser.json());
+const controller = personController(app)
+app.use('/person', personRoutes(controller)); 
+
+app.use(errorMiddleware);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 module.exports = app;
